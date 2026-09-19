@@ -32,7 +32,7 @@ async function request(data,instructions,validate,onProgress) {
     onProgress(attempt?'Refining the draft to meet the outcome rules…':'Drafting on your device…');
     let timer,poll;
     try {
-      const reply=await Promise.race([engine.chat.completions.create({messages:[{role:'system',content:SYSTEM},{role:'user',content:user+(issue?'\nCorrect this problem from the previous attempt: '+issue:'')}],temperature:.35,max_tokens:1600,stream:false,response_format:{type:'json_object'}}),new Promise((_,reject)=>{timer=setTimeout(()=>{stop();reject(new Error('Generation timed out. Reload the model and try a shorter request.'));},240000);}),new Promise((_,reject)=>{poll=setInterval(()=>{if(token!==epoch)reject(new Error('Generation cancelled. Your work is unchanged.'));},250);})]);
+      const reply=await Promise.race([engine.chat.completions.create({messages:[{role:'system',content:SYSTEM},{role:'user',content:user+(issue?'\nCorrect this problem from the previous attempt: '+issue:'')}],temperature:.35,max_tokens:900,stream:false,response_format:{type:'json_object'}}),new Promise((_,reject)=>{timer=setTimeout(()=>{stop();reject(new Error('Generation timed out after two minutes. Reload the model and try again with one SLO and one objective.'));},120000);}),new Promise((_,reject)=>{poll=setInterval(()=>{if(token!==epoch)reject(new Error('Generation cancelled. Your work is unchanged.'));},250);})]);
       if(token!==epoch)throw new Error('Generation cancelled.');
       const choice=reply.choices?.[0];if(choice?.finish_reason==='length')throw new Error('The AI draft exceeded the response limit. Please try again.');
       const text=choice?.message?.content||'';if(text.length>22000)throw new Error('The AI response exceeded the size limit.');
