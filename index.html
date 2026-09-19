@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A private, browser-based workspace for course outcomes and meaningful learning assessments.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://huggingface.co https://*.huggingface.co https://*.hf.co https://raw.githubusercontent.com; worker-src 'self' blob:; child-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Learning Assessment Wizard</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="src/styles.css">
+  <script src="vendor/jszip.min.js" defer></script>
+  <script type="module" src="src/app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#workspace">Skip to workspace</a>
+  <header class="topbar"><a class="brand" href="./"><img class="brandmark" src="favicon.svg" alt="" width="43" height="43"><span class="brand-name">Learning Assessment<br>Wizard</span></a><button id="clear" class="text-button" hidden>Start over</button></header>
+  <div class="shell">
+    <main id="workspace" tabindex="-1">
+      <div id="notice" role="status" aria-live="polite"></div>
+      <section id="welcome-panel" class="panel welcome-panel" aria-labelledby="welcome-title" hidden>
+        <h1 id="welcome-title">What would you like to create today?</h1>
+        <p class="lede">Choose a starting point.</p>
+        <div class="generator-goals" role="group" aria-label="What would you like to create today?">
+          <button class="goal-button" data-goal="assignments"><span class="goal-icon" aria-hidden="true">▤</span><strong>Assignments</strong><span>Build activities that measure your existing SLOs.</span><span class="goal-arrow" aria-hidden="true">→</span></button>
+        </div>
+      </section>
+      <section id="course-panel" class="panel course-entry">
+        <div class="page-heading"><div><p class="eyebrow" id="creation-label">SLOs</p><h1>Tell us about your course.</h1><p class="lede">Add a title, description, and objectives to get started.</p></div></div>
+        <div class="card">
+          <details class="course-import"><summary>Use a course outline instead</summary><p class="small muted">Upload a TXT, DOCX, or text-based PDF (up to 5 MB), or paste your outline. Review the extracted fields below.</p><label for="file">Course outline file</label><input id="file" type="file" accept=".txt,.docx,.pdf"><div id="import-status" role="status" class="small"></div><details><summary>Paste outline text</summary><label for="raw">Outline text</label><textarea id="raw" rows="7" maxlength="40000" placeholder="Course title: …&#10;Course description: …&#10;Course objectives: …&#10;Student learning outcomes: …"></textarea><button id="parse" class="button secondary">Fill course fields</button></details></details>
+          <label for="title">Course title</label><input id="title" maxlength="180" placeholder="e.g., Introduction to Environmental Science" autocomplete="off" required>
+          <label for="description">Course description</label><textarea id="description" rows="4" maxlength="6000" placeholder="Describe the course scope, content, and level." required></textarea>
+          <label for="objectives">Course objectives <span class="required">one per line</span></label><textarea id="objectives" rows="5" maxlength="16000" placeholder="Explain interactions within an ecosystem.&#10;Analyze environmental data to evaluate human impacts." required></textarea>
+          <div id="course-slos" hidden><label for="existing">Student learning outcomes (SLOs) <span class="required">one per line</span></label><textarea id="existing" maxlength="8000" rows="5" placeholder="Paste the SLOs your assignments should measure."></textarea></div>
+          <div class="card-actions"><button id="example" class="text-button">Try an example</button><button id="continue" class="button primary">Continue to SLOs →</button></div>
+        </div>
+        <p class="session-note">Your work stays in this tab. Export before closing or refreshing.</p>
+      </section>
+      <section id="outcomes-panel" class="panel" hidden></section>
+      <section id="assignments-panel" class="panel" hidden></section>
+      <section id="report-panel" class="panel" hidden></section>
+      <footer><a href="#about" id="about-link">About & privacy</a></footer>
+    </main>
+  </div>
+  <dialog id="about"><div class="dialog-head"><h2>Frameworks & privacy</h2><button id="close-about" class="button secondary">Close</button></div><h3>Bloom’s taxonomy</h3><p>This tool uses Anderson and Krathwohl’s established 2001 revision: Remember, Understand, Apply, Analyze, Evaluate, and Create, alongside factual, conceptual, procedural, and metacognitive knowledge. New AI-focused adaptations are not a universally adopted replacement.</p><p><a href="https://assessment.ucdavis.edu/assessment/Bloom" target="_blank" rel="noopener noreferrer">Read UC Davis’s taxonomy guide ↗</a></p><h3>VARK modalities</h3><p>Visual, Aural, Read/write, and Kinesthetic describe activity modalities here, not fixed student types. Selecting modalities does not diagnose a learner or imply that matching instruction to a preference improves achievement. Offer accessible alternatives that preserve the learning construct.</p><p><a href="https://vark-learn.com/about-vark/what-vark-is-and-isnt/" target="_blank" rel="noopener noreferrer">Read VARK’s framework guidance ↗</a></p><h3>How drafts work</h3><p>Drafts are generated by a free local Qwen2.5 model through WebLLM. Confirm subject accuracy, appropriate scope, objective coverage, and performance criteria before use. Suggested mastery thresholds are editable starting points.</p><h3>Data and files</h3><p>Course content is processed in this tab. There is no analytics, account, database, saved course text, or external generation service. Public model files are cached by WebLLM; use “Remove cached model” to delete them. Downloads save copies on your device. Your hosting provider and model-download providers may log requests and IP addresses; course text is not included in those requests.</p><p>Imports are limited by type, size, and parsing time. Only document text is extracted. Active content and suspicious control characters are rejected. No file checker guarantees a file is safe. Unusual academic language, multilingual text, and discussion of sensitive topics are not treated as misconduct.</p><h3>AI-resilient assessment</h3><p>Process checkpoints, course-specific evidence, and individual explanation make learning more observable. They do not make an assignment AI-proof. This tool does not use AI detectors or infer misconduct.</p></dialog>
+</body>
+</html>

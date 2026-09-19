@@ -1,0 +1,15 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {safeText,parseOutline,readCourse,validateOutcome,outcomeIssues,validateAssignment,checkZipDirectory,escapeHTML} from '../src/core.js';
+const course={title:'Environmental Science',description:'Analyze environmental evidence.',objectives:['Analyze environmental data.'],existing:[]};
+const outcome={sentence:'Analyze ecosystem data using two relevant observations to support an interpretation.',level:'Analyze',objectiveIds:[1],criteria:'Interpretation matches both observations.',assessment:'Rubric-graded case analysis.'};
+test('multilingual and sensitive academic text stays valid',()=>{assert.equal(safeText('Écologie 生態学 — discourse about violence'),'Écologie 生態学 — discourse about violence');});
+test('active markup and hidden control characters are rejected',()=>{for(const text of ['<script>alert(1)</script>','<svg onload=alert(1)>','hello\u0000world','test\u202Etxt'])assert.throws(()=>safeText(text));});
+test('rendering escapes user text',()=>assert.equal(escapeHTML('<img src=x onerror="x">'),'&lt;img src=x onerror=&quot;x&quot;&gt;'));
+test('outline headings preserve objective lines and SLOs',()=>{const p=parseOutline('Course title: Biology\nCourse description: Cells and systems\nCourse objectives:\n1. Explain cell processes.\n2. Analyze evidence.\nSLOs:\nAnalyze a cell model.');assert.equal(p.fields.title,'Biology');assert.equal(p.fields.existing,'Analyze a cell model.');assert.equal(readCourse({...p.fields}).objectives.length,2);});
+test('missing title or objective fails',()=>assert.throws(()=>readCourse({title:'',description:'test',objectives:'',existing:''})));
+test('valid SLO includes required alignment and evidence',()=>assert.deepEqual(validateOutcome(outcome,course),outcome));
+test('out-of-range AI objective references fail closed',()=>assert.throws(()=>validateOutcome({...outcome,objectiveIds:[22]},course)));
+test('non-measurable, compound, overlong, and level-mismatched outcomes are flagged',()=>{for(const patch of [{sentence:'Understand ecosystems.'},{sentence:'Analyze and evaluate ecosystems.'},{sentence:'Analyze '+('evidence '.repeat(30))},{level:'Create'}])assert.ok(outcomeIssues({...outcome,...patch}).length);});
+test('malformed AI assignments are rejected',()=>assert.throws(()=>validateAssignment({title:'Paper',steps:[]})));
+test('fake DOCX fails signature validation',()=>assert.throws(()=>checkZipDirectory(new TextEncoder().encode('fake zip').buffer)));
